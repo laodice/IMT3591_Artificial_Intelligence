@@ -3,23 +3,21 @@
 \usepackage{url}					%
 \usepackage{hyperref}				%Make Links clickable
 \usepackage{graphicx}				%For Pictures, includegraphics[options]{name}
-
 \usepackage{fancyhdr}				%For better headers
 
+%%%%%%Setting up the header
 \fancyhead{}						% clear all header fields
 \chead{\bfseries Medical technology in smart cars}	%Print the ditle of the paper in every header, in the center
 \renewcommand{\headrulewidth}{0.4pt}%Make a line between the header and the content
-
-
 \pagestyle{fancy}					%Use the fancy style from the package for the headers and footers
-\renewcommand{\headrulewidth}{0.4pt}
 
+%%%%%Edit style of the document
 \setlength{\parindent}{0cm}			%Removes the indent from paragraphes
 
 
 
-
-\title{								%Set all the data for the title page, which is created later in the document
+%%%%%Set Title values
+title{								%Set all the data for the title page, which is created later in the document
 	\includegraphics[height=2cm]{higlogo}\\\vspace{1cm}	%vspace, vertical space of x cm to the next line
 	Medical technology in smart cars\\\vspace{7mm}
 	\Large{Project work of group 5}\\\vspace{5mm}
@@ -28,7 +26,7 @@
 		Gj\o{}vik University College
 		\\\vspace{1cm}}}
 
-
+%%%%%%Set author values
 \author{			%Set the author, als included on the title page
 Laodice Melliti\\
 Matr.-Nr: 140159\\
@@ -106,9 +104,9 @@ To do so, we will implement sensors in the car to measure heart rate, blood pres
 \subsection{System architecture}
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.5]{architecture}
-	\caption{System Architecture}
-	\label{fig:sys}
+	\includegraphics[scale=0.5]{architecture}		%Include picture
+	\caption{System Architecture}					%Picture caption
+	\label{fig:sys}									%Label of the picture, can be referenced with \ref{fig:sys}
 \end{figure}
 Our system architecture is presented in Figure \ref{fig:sys}.
 \begin{description}\addtolength{\itemsep}{-0.5\baselineskip}
