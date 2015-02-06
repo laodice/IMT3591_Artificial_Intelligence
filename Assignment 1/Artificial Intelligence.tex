@@ -1,6 +1,6 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{article}		%Basic Document class: article
 \usepackage[english]{babel}			%Babel
-\usepackage{url}					%
+\usepackage{url}				%
 \usepackage{hyperref}				%Make Links clickable
 \usepackage{graphicx}				%For Pictures, includegraphics[options]{name}
 \usepackage{fancyhdr}				%For better headers
@@ -8,17 +8,17 @@
 %%%%%%Setting up the header
 \fancyhead{}						% clear all header fields
 \chead{\bfseries Medical technology in smart cars}	%Print the ditle of the paper in every header, in the center
-\renewcommand{\headrulewidth}{0.4pt}%Make a line between the header and the content
+\renewcommand{\headrulewidth}{0.4pt}			%Make a line between the header and the content
 \pagestyle{fancy}					%Use the fancy style from the package for the headers and footers
 
 %%%%%Edit style of the document
 
 %%%%%Set Title values
-\title{								%Set all the data for the title page, which is created later in the document
+\title{									%Set all the data for the title page, which is created later in the document
 	\includegraphics[height=2cm]{images/higlogo}\\\vspace{1cm}	%vspace, vertical space of x cm to the next line
 	Medical technology in smart cars\\\vspace{7mm}
-	\Large{Project work of group 5}\\\vspace{5mm}
-	\normalsize{Spring Semester 2015}\\\vspace{1cm}
+	\Large{Project work of group 5}\\\vspace{5mm}			%Large, for a bigger font.
+	\normalsize{Spring Semester 2015}\\\vspace{1cm}			
 	\large{IMT 3591 Artificial Intelligence\\
 		Gj\o{}vik University College
 		\\\vspace{1cm}}}
@@ -59,7 +59,7 @@ Names of the group members: Laodice Melliti, Jonas Helbig\\
 Contribution of Laodice Melliti: System 3, Our system, system architecture - graphic\\
 Contribution of Jonas Helbig: System 1, system 2, Our system \\
 \section{Introduction}
-\indent
+\indent					%Dirty fix, to indent the first line in each section. 
 \indent Throughout this paper, we will design an AI system, which could later be implemented in a smart car application. The primary goal of the system is to assist elderly or sick people during everyday driving situations.
 
 We begin this paper with a look at  the state of art in the area of in-car vital parameter monitoring. We give a short overview and look at three systems in more detail. Afterwards, we introduce and describe our proposed system.
