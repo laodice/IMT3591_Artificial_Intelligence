@@ -26,7 +26,7 @@ From the different sensors and actuators described in the last section we are go
 	\item Blood pressure meter: From this sensor we use both the systolic and the diastolic blood pressure values. For our purpose, we assume that we get the values as millimeters of mercury
 	\item GPS: For each dataset we save in the database we save the approximate GPS location
 \end{itemize}
-The process is summarized in figure \ref{fig:flow }
+The process is summarized in figure \ref{fig:flow}.
 \begin{figure}
 	\graphitemize{Phase 1,Phase 2, Phase 3, Phase 4, Phase 5, Phase 6}
 	\caption{Process flow of our implementation}
@@ -38,79 +38,75 @@ The pseudo code for our approach is specified through the algorithms \ref{alg:ca
 We focus on the important functions and aspects, without going into details about the capturing and preparation of the data.
 All the important functions and variables used are described below.
 \begin{algorithm}[htbp]
-	\begin{algorithmic}
+	\begin{algorithmic}[1]
 		\Require{None}
-		\Ensure{Stores different important values in a database}
+		\Ensure{Database, Session trend}
 		\Repeat
-		\State $data \gets CaptureData()$ 
-		\State $data \gets PrepareData(data)$
-		\State $data \gets ExtractFeatures()$ \Comment{data: concrete numbers of BP/ BR and HB?}
-		\State $median \gets Average(data)$ \Comment{Average of the last 5 minutes}
+		\State $data \gets$ \Call{CaptureData()}{}
+		\State $data \gets$ \Call{PrepareData}{$data$}
+		\State $data \gets$ \Call{ExtractFeatures()}{} \Comment{data: concrete numbers of BP/ BR and HB?}
+		\State $median \gets$ \Call{Average}{$data$} \Comment{Average of the last 5 minutes}
 		\State $weight \gets 1$ 
-		\State $GPScoordinate \gets GetGPS()$
+		\State $GPScoordinates \gets$ \Call{GetGPS()}{}
 		\State $weight \gets 1$  \Comment{Default value for the weighting function}
-		\If {OutsideBoundaries(median)}
-			\State $response \gets AskUserQuestions()$
-			\If $response == yes$ \Comment{//yes $\rightarrow$ valid reason for data out of boundaries}
-				\State $ReduceWeight()$
+		\If {\Call{OutsideBoundaries}{$median$}}
+			\State $response \gets$ \Call{AskUserQuestions()}{}
+			\If {$response == yes$} \Comment{yes: valid reason for data out of boundaries}
+				\State \Call{ReduceWeight()}{}
 			\Else
-				\State $IncreaseWeight()$ 
-			\EndIf
+				\State \Call{IncreaseWeight()}{}			\EndIf
 		\EndIf
 				
-		\State $Store(median, weight, GPScooridinate)$ \Comment{Save values in Database}
+		\State \Call{Store}{$median$, $weight$, $GPScooridinates$} \Comment{Save values in Database}
 		\Until{Driving session is over}
-		\State $AverageOfSession()$	\Comment{Presented at the end of each driving session}
+		\State \Call{SessionEvaluation()}{}	\Comment{Presented at the end of each driving session}
 	\end{algorithmic}
 	\caption{Capturing, processing and storing the data}
 	\label{alg:capture}
 \end{algorithm}
 		%%%%%%%%
 \begin{algorithm}[htbp]
-	\begin{algorithmic}	
+	\begin{algorithmic}[1]	
 		\Require Database
 		\Ensure Recommendation for the user
 		\Repeat
-		\State $data \gets ReadDatabase()$
-		\State $rating \gets 0$
-		
-		\For {Every dataset in data} \Comment{every dataset consists of median, weight and gps}
+		\State $data \gets$ \Call{ReadDatabase()}{}
+		\State $rating \gets 0$	
+		\ForAll {$dataset$ in $data$} \Comment{every dataset consists of median, weight and gps}
 		\State $rating \gets rating + weight * median$
 		\EndFor
-		
-		\State $rating \gets rating / data.lenght$ \Comment{Average with weight}
-		\If {OutsideBoundaries(rating)}
-			\State $makeRecommendation()$
+		\State $rating \gets rating  data.lenght$ \Comment{Average with weight}
+		\If {\Call{OutsideBoundaries}{$rating$}}
+			\State \Call{makeRecommendation()}{}
 		\EndIf
-		
 		\Until{24 hours are over}
 	\end{algorithmic}
 	\caption{Long term monitoring}
 	\label{alg:longterm}
 \end{algorithm}
 
-Algorithm \ref{alg:capture}
+\paragraph{Detailed explanation for Algorithm \ref{alg:capture}}
 \begin{description}
 	\item [CaptureData()] For the heart beat and breath rate : we capture the data every seconds. For the blood pressure, we capture the data every 30 minutes
 	\item [PrepareData(data)] We normalyse the data received and reduce the noise as much as possible.
-
 	\item [ExtractFeatures()] The data we previously captured is analog and we need digital data for the analysis. As such, we convert the analog data into digital data.
-	\item [AverageData()] Every 5 minutes, we make a average of all the data received.
-	\item [OutsideBoundaries(data)] We check if the data is outside the boundaries. Those boundaries are set up by a doctor when the system is implemented in the car. This function return a boolean variable\\
+	\item [Average()] Every 5 minutes, we make a average of all the data received.
+	\item [GetGPS()] Get the current GPS position
+	\item [OutsideBoundaries(median)] We check if the data is outside the boundaries. Those boundaries are set up by a doctor when the system is implemented in the car. This function return a boolean variable\\
 	True : the data is outside the boundaries\\
 	False : the data is inside the boundaries. In this case we assume everything is fine
-	\item [askUserQuestion()] We ask the driver if he had exerciced recently and if he is feeling unwell or stressed. If the answer to any of this questions is yes, then the function return a boolean variable set to true. Otherwise, it returns false.
-\item [Store(median, weight, GPScooordinate)] We store together all the medians, their weight and the GPS coordinates assiociated into the database.
-\item [AverageOfSession()] We make an average of all the data received dureing the drivinig session so that we can compare two driving session one to the other.
+	\item [AskUserQuestion()] We ask the driver if he had exerciced recently and if he is feeling unwell or stressed. If the answer to any of this questions is yes, then the function return a boolean variable set to true. Otherwise, it returns false.
+\item [Store(median, weight, GPScooordinates)] We store together all the medians, their weight and the GPS coordinates assiociated into the database.
+\item [SessionEvaluation()] We make an average of all the data received dureing the drivinig session so that we can compare two driving session one to the other.
 \end{description}
-Algorithm \ref{alg:longterm}
+\paragraph{Detailed explanation for Algorithm \ref{alg:longterm}}
 \begin{description}
 	\item [ReadDatabase()] We put a specific anount of data into a new variable to analyse this whithout accidently changing our saved data.
 	\item [OutsideBoundaries()] See function capture
-	\item [makeRecommendation()] Depending of the result, we either make recommendation to see a Doctor (via speakers) or we inform the driver that everything is fine.
+	\item [MakeRecommendation()] Depending of the result, we either make recommendation to see a Doctor (via speakers) or we inform the driver that everything is fine.
 \end{description}
 
-
+\newpage
 \section{Updated system architecture}
 \begin{figure}[h]
 	\centering
@@ -118,3 +114,14 @@ Algorithm \ref{alg:longterm}
 	\caption{System Architecture redefined for the scope of our project}					%Picture caption
 	\label{fig:impsys}									%Label of the picture, can be referenced with \ref{fig:impsys}
 \end{figure}
+
+\begin{description}\addtolength{\itemsep}{-0.5\baselineskip}
+	\item{R1:} Get the GPS position
+	\item{R2:} Get the extracted features for the blood pressure
+	\item{R3:} Get the extracted features for the breathing rate and the heart beat
+	\item{R4:} Receive response from user
+	\item{R5:} Ask user questions
+
+	
+	If needed, it uses the GPS coordinates (sensor).
+\end{description}

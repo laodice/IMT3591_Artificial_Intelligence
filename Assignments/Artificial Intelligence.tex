@@ -6,6 +6,7 @@
 \usepackage{fancyhdr}				%For better headers
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{tikz}
 \usetikzlibrary{calc} 
@@ -43,6 +44,11 @@
 	\end{tikzpicture}  
 }%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}%Change ensure and require to input and output
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\algrenewcommand{\algorithmiccomment}[1]{\hfill$\rightarrow$ \begin{minipage}[t]{0.3\textwidth}#1\end{minipage}}
 
 %%%%%%Setting up the header
 \fancyhead{}						% clear all header fields
@@ -103,6 +109,9 @@ Matr.-Nr: 140165\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ieeetr}  	%Set the style for the bibliography, after certain standards
 \bibliography{bibliography}			%Automaticly create a bibliography
+\newpage
 
+\listoffigures
+\listofalgorithms
 \end{document}
 %End of the whole document, everything from here will be ignored
