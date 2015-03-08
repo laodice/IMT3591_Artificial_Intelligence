@@ -2,38 +2,43 @@
 \textbf{Contribution of Laodice Melliti:} Implementation scope, algorithmic design and description, implemented system architecture graphic\\
 \textbf{Contribution of Jonas Helbig:}  Implementation scope, algorithmic design and description\\
 \section{Implementation scope}
-The system as presented by us so far is too comprehensive to be fully implemented during this project. We this section we will give an estimation about which parts of the system can actually be implemented by us in the scope of this project.
+\indent					%Dirty fix, to indent the first line in each section. 
+\indent
+The system as presented by us so far is too comprehensive to be fully implemented during this project. This section will give an estimation about which parts of the system can actually be implemented by us in the scope of this project.
 
-Instead of focusing on emergency response systems with functions like detecting heart attacks, sleep attacks or even death during driving, we implement a system for long term measurement and monitoring of the user.
+Instead of focusing on emergency response systems with functions like detecting heart attacks, sleep attacks or even death during driving, we implement a system for long term measurement and monitoring of the user's health.
 We focus on three different health values, namely the heart beat, the breathing rate and the blood pressure. Our system is intended to be used by elderly people or people with illnesses affecting one of those parameters. 
 We create a system capable of detecting unusual or undesirable development of a persons health over a longer period of 30-100 days.
 
 In short, our system will create long term trends on the development of the user's health status. While doing that it is smart enough to detect unusal values and assess them in cooperation with the user to reduce or increase their influence on the trend.
-The process is further described in listing
+The process is further described below.
 \begin{enumerate}
-	\item For the initial setup of the training, we recommend the visit of a doctor. Since every patient has a different medical history, a doctor has to determine through several appropriate test the ``normal'' condition of the patient in reference to our desired parameters. After the initial setup, the system will be activated every time the users uses his car.
-	\item During each session the system will capture the parameters from the user, prepare and normalize the data and extract the features
-	\item The extracted features (as described later) will be processes by our system with the algorithms described in the next section
-	\item The system will react to unusual values, outside of the boundary predetermined by a doctor in the first step and it will try to find reasonable explanations in cooperation with the user, with a predefined question catalog. The questions can be answered binary, so that the user could easily give feedback without being distracted while driving 
-	\item Depending on the responds of the user, the system will adjust its validation and weighting system for the calculation of the long term rating
-	\item Those ratings determined over a longer time will be repeatedly presented to the user, together with recommendations on how to react 
+	\item For the initial setup of the training, we recommend the visit of a doctor. Since every patient has a different medical history, a doctor has to determine through several appropriate test the ``normal'' condition of the patient in reference to our desired parameters. Those are the boundaries used by our functions defined later. After the initial setup, the system will be activated every time the users uses his car.
+	\item During each session the system will capture the parameters from the user, prepare and normalize the data and extract our desired features.
+	\item The extracted features (as described later) will be processes by our system with the algorithms described in the next section.
+	\item The system will react to unusual values, outside of the boundaries predetermined by a doctor in the first step and it will try to find reasonable explanations in cooperation with the user, with a predefined question catalog. The questions can be answered binary, so that the user could easily give feedback without being distracted while driving. 
+	\item Depending on the responds of the user, the system will adjust its validation and weighting system for the calculation of the long term rating.
+	\item Those ratings determined over a longer time will be repeatedly presented to the user, together with recommendations on how to react.
 \end{enumerate}
 
-To reduce the complexity and avoid handling raw medical data, we are only implementing the steps three to six. The other steps would be scope of another research paper and should focus on the practicality of the extraction of the desired data.
+To reduce the complexity and avoid handling raw medical data, we are only implementing the steps three to six. The other steps would be scope of further research and could for example focus on the practicality of this preparation and extraction.
 From the different sensors and actuators described in the last section we are going to use the following ones:
 \begin{itemize}
-	\item Hear belt: From this sensor we use the heart beat rate and the breathing rate which is continuously measured. For our purpose, we assume that we get the values as heart beat per second.
-	\item Blood pressure meter: From this sensor we use both the systolic and the diastolic blood pressure values. For our purpose, we assume that we get the values as millimeters of mercury
-	\item GPS: For each dataset we save in the database we save the approximate GPS location
+	\item Hear belt: From this sensor we use the heart beat rate and the breathing rate which is continuously measured. For our purpose, we assume that we get the values as heart beat per second and breaths per second.
+	\item Blood pressure meter: From this sensor we use both the systolic and the diastolic blood pressure values. For our purpose, we assume that we get the values as millimeters of mercury. Since acquiring the blood pressure data can be distracting for the driver, we only measure them once every 30 minutes.
+	\item GPS: For each dataset we save in the database we save the approximate GPS location. This could later be used to determine eventual correlations between the health status and the physical position of the user (for example often stress during driving on a highway).
 \end{itemize}
-The process is summarized in figure \ref{fig:flow}.
+Our implementation is summarized in figure \ref{fig:flow}.
 \begin{figure}
-	\graphitemize{Phase 1,Phase 2, Phase 3, Phase 4, Phase 5, Phase 6}
+	\centering
+	\graphitemize{Get features,  Create long\\term trend, Modify weights, Ask user, Detect unusual\\ values}
 	\caption{Process flow of our implementation}
 	\label{fig:flow}
 \end{figure}
 
 \section{Algorithmic approach}
+\indent					%Dirty fix, to indent the first line in each section. 
+\indent
 The pseudo code for our approach is specified through the algorithms \ref{alg:capture} and \ref{alg:longterm}.
 We focus on the important functions and aspects, without going into details about the capturing and preparation of the data.
 All the important functions and variables used are described below.
@@ -42,11 +47,12 @@ All the important functions and variables used are described below.
 		\Require{None}
 		\Ensure{Database, Session trend}
 		\Repeat
-		\State $data \gets$ \Call{CaptureData()}{}
-		\State $data \gets$ \Call{PrepareData}{$data$}
-		\State $data \gets$ \Call{ExtractFeatures()}{} \Comment{data: concrete numbers of BP/ BR and HB?}
+		\For {five minutes}
+		\State $capturedData \gets$ \Call{CaptureData()}{}
+		\State $preparedData \gets$ \Call{PrepareData}{$capturedData$}
+		\State $data \gets$ \Call{ExtractFeatures}{$preparedData$} \Comment{data: concrete numbers of BP/ BR and HB}
+		\EndFor
 		\State $median \gets$ \Call{Average}{$data$} \Comment{Average of the last 5 minutes}
-		\State $weight \gets 1$ 
 		\State $GPScoordinates \gets$ \Call{GetGPS()}{}
 		\State $weight \gets 1$  \Comment{Default value for the weighting function}
 		\If {\Call{OutsideBoundaries}{$median$}}
@@ -73,45 +79,70 @@ All the important functions and variables used are described below.
 		\State $data \gets$ \Call{ReadDatabase()}{}
 		\State $rating \gets 0$	
 		\ForAll {$dataset$ in $data$} \Comment{every dataset consists of median, weight and gps}
-		\State $rating \gets rating + weight * median$
+		\State $rating \gets rating + dataset.weight * dataset.median$
 		\EndFor
-		\State $rating \gets rating  data.lenght$ \Comment{Average with weight}
+		\State $rating \gets rating / data.length$ \Comment{Average with weight}
 		\If {\Call{OutsideBoundaries}{$rating$}}
 			\State \Call{makeRecommendation()}{}
 		\EndIf
-		\Until{24 hours are over}
+		\Until{}
 	\end{algorithmic}
 	\caption{Long term monitoring}
 	\label{alg:longterm}
 \end{algorithm}
 
 \paragraph{Detailed explanation for Algorithm \ref{alg:capture}}
+\subparagraph{Functions:}
 \begin{description}
-	\item [CaptureData()] For the heart beat and breath rate : we capture the data every seconds. For the blood pressure, we capture the data every 30 minutes
-	\item [PrepareData(data)] We normalyse the data received and reduce the noise as much as possible.
-	\item [ExtractFeatures()] The data we previously captured is analog and we need digital data for the analysis. As such, we convert the analog data into digital data.
-	\item [Average()] Every 5 minutes, we make a average of all the data received.
+	\item [CaptureData()] For the heart beat and breath rate : capture the data every second. For the blood pressure, capture the data every 30 minutes.
+	\item [PrepareData(capturedData)] Normalization of the data received, reduction of the noise as much as possible and conversion from analog data into digital data.
+	\item [ExtractFeatures(preparedData)] Extraction of the concrete values we use in the later steps of the algorithm.
+	\item [Average()] Every 5 minutes, we make an average of all the data received.
 	\item [GetGPS()] Get the current GPS position
-	\item [OutsideBoundaries(median)] We check if the data is outside the boundaries. Those boundaries are set up by a doctor when the system is implemented in the car. This function return a boolean variable\\
-	True : the data is outside the boundaries\\
-	False : the data is inside the boundaries. In this case we assume everything is fine
+	\item [OutsideBoundaries(median)] We check if the data is outside the boundaries (too high or too low in comparison to the patients optimal health state). Those boundaries are set up by a doctor when the system is implemented in the car. This function returns a boolean variable\\
+	\underline{True} : The data is outside the boundaries\\
+	\underline{False} : The data is inside the boundaries. In this case we assume everything is fine
 	\item [AskUserQuestion()] We ask the driver if he had exerciced recently and if he is feeling unwell or stressed. If the answer to any of this questions is yes, then the function return a boolean variable set to true. Otherwise, it returns false.
-\item [Store(median, weight, GPScooordinates)] We store together all the medians, their weight and the GPS coordinates assiociated into the database.
-\item [SessionEvaluation()] We make an average of all the data received dureing the drivinig session so that we can compare two driving session one to the other.
-\end{description}
-\paragraph{Detailed explanation for Algorithm \ref{alg:longterm}}
-\begin{description}
-	\item [ReadDatabase()] We put a specific anount of data into a new variable to analyse this whithout accidently changing our saved data.
-	\item [OutsideBoundaries()] See function capture
-	\item [MakeRecommendation()] Depending of the result, we either make recommendation to see a Doctor (via speakers) or we inform the driver that everything is fine.
+	\item [ReduceWeight()] Set the weight to a number between zero and one. This later reduces the impact of the data to the long term trend. It is necessary to reduce the influence of abnormal data which has a valid reason.
+	\item [IncreaseWeight()] Set the weight to a number above one. This later increases the impact of the data to the long term trend. It is necessary to increase the influence of abnormal data which does not have a valid reason.
+\item [Store(median, weight, GPScooordinates)] We store the median, the weight and the GPS coordinates associated together into the database.
+\item [SessionEvaluation()] We make an average of all the data received during the driving session so that we can compare two driving sessions with each other.
 \end{description}
 
+\subparagraph{Variables:}
+\begin{description}
+	\item [capturedData] The data captured by the sensors without any processing.
+	\item [preparedData] The captured data is normalized, noise-reduced and converted to digital.
+	\item [data] The concrete values used by our system during the later steps of the algorithms.
+	\item [median] The average of 5 minutes of data.
+	\item [GPScoordinates] Everytime we calculate the median, we acquire the GPS coordinates of the car. That way, it can be possible to make a correlation between the place and the driver's status.
+	\item [weight] Importance given to a median. The default is one (neutral). If the median is out of boundaries and the driver says there is a reason for it (eg. : tiredness, stress, exercises,\dots ) then we reduce the weight. If there is no explanations for the median to be out of boundaries, then we increase the weight.
+	
+	
+\end{description}
+\paragraph{Detailed explanation for Algorithm \ref{alg:longterm}}
+\subparagraph{Functions:}
+\begin{description}
+	\item [ReadDatabase()] We put a specific amount of data into a new variable to analyze them without accidentally changing our saved data.
+	\item [OutsideBoundaries()] See functions of algorithm \ref{alg:capture}.
+	\item [MakeRecommendation()] Depending of the result, we either make recommendation to see a Doctor (via speakers), we give the driver advices or we inform them that everything is fine.
+\end{description}
+\subparagraph{Variables:}
+\begin{description}
+	\item [data] Contain a certain amount of the database information.
+	\item [rating] Used to calculate the average with weight of the data.
+	\item [data.length] Length of the variable data which is an array.
+	\item [dataset.weight] Value defined in algorithm \ref{alg:capture}.
+	\item [dataset.median] Value defined in algorithm \ref{alg:capture}.
+\end{description}
 \newpage
 \section{Updated system architecture}
+\indent					%Dirty fix, to indent the first line in each section. 
+\indent
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.8]{./images/implementationArchitecture}		%Include picture
-	\caption{System Architecture redefined for the scope of our project}					%Picture caption
+	\caption{System architecture redefined for the scope of our project}					%Picture caption
 	\label{fig:impsys}									%Label of the picture, can be referenced with \ref{fig:impsys}
 \end{figure}
 
@@ -119,9 +150,6 @@ All the important functions and variables used are described below.
 	\item{R1:} Get the GPS position
 	\item{R2:} Get the extracted features for the blood pressure
 	\item{R3:} Get the extracted features for the breathing rate and the heart beat
-	\item{R4:} Receive response from user
+	\item{R4:} Receive responses from user
 	\item{R5:} Ask user questions
-
-	
-	If needed, it uses the GPS coordinates (sensor).
 \end{description}
