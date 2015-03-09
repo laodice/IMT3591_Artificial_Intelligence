@@ -1,6 +1,6 @@
 \section{Formal: Assignment 2}
-\textbf{Contribution of Laodice Melliti:} Implementation scope, algorithmic design and description, implemented system architecture graphic\\
-\textbf{Contribution of Jonas Helbig:}  Implementation scope, algorithmic design and description\\
+\textbf{Contribution of Laodice Melliti:} Implementation scope, algorithmic design and description, figure \ref{fig:impsys}\\
+\textbf{Contribution of Jonas Helbig:}  Implementation scope, algorithmic design and description, figure \ref{fig:flow}\\
 \section{Implementation scope}
 \indent					%Dirty fix, to indent the first line in each section. 
 \indent
@@ -75,7 +75,7 @@ All the important functions and variables used are described below.
 	\begin{algorithmic}[1]	
 		\Require Database
 		\Ensure Recommendation for the user
-		\Repeat
+		\Cus
 		\State $data \gets$ \Call{ReadDatabase()}{}
 		\State $rating \gets 0$	
 		\ForAll {$dataset$ in $data$} \Comment{every dataset consists of median, weight and gps}
@@ -85,7 +85,7 @@ All the important functions and variables used are described below.
 		\If {\Call{OutsideBoundaries}{$rating$}}
 			\State \Call{makeRecommendation()}{}
 		\EndIf
-		\Until{}
+		\EndCus
 	\end{algorithmic}
 	\caption{Long term monitoring}
 	\label{alg:longterm}

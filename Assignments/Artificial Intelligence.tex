@@ -5,6 +5,7 @@
 \usepackage{graphicx}				%For Pictures, includegraphics[options]{name}
 \usepackage{fancyhdr}				%For better headers
 \usepackage{algorithm}
+\usepackage{algorithmicx}
 \usepackage{algpseudocode}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,11 +45,18 @@
 	\end{tikzpicture}  
 }%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\algblockdefx[ON]{On}{EndOn}
+[2]{\textbf{on}}
 
+\algblockdefx[CUSREPEAT]{Cus}{EndCus}
+[0]{\textbf{repeat}}
+[0]{\textbf{every day}}
+	
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}%Change ensure and require to input and output
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 
-\algrenewcommand{\algorithmiccomment}[1]{\hfill // \begin{minipage}[t]{0.3\textwidth}#1\end{minipage}}
+%\algdef{SE}[REPEATEVERYDAY]{Repeatt}{EveryDay}{Repeat}[1]{Every day}%
+\algrenewcommand{\algorithmiccomment}[1]{\hfill // \begin{minipage}[t]{0.25\textwidth}#1\end{minipage}}
 
 %%%%%%Setting up the header
 \fancyhead{}						% clear all header fields
